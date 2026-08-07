@@ -1,0 +1,628 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النظام المحاسبي الشامل | ERP Accounting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* القائمة الجانبية Navigation Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background-color: #1a252f;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: #ecf0f1; }
+        .sidebar-header p { margin: 5px 0 0; font-size: 0.8rem; color: #bdc3c7; }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .nav-links li button {
+            width: 100%;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            text-align: right;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .nav-links li button:hover, .nav-links li button.active {
+            background-color: var(--secondary-color);
+            border-right: 5px solid var(--accent-color);
+            padding-right: 15px;
+        }
+
+        /* محتوى الصفحات Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* البطاقات والواجهات Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 { margin: 0; color: var(--primary-color); }
+        .subtitle { font-size: 0.85rem; color: #7f8c8d; }
+
+        /* النموذج والمدخلات Forms & Inputs */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+
+        /* الأزرار Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--secondary-color); color: white; }
+        .btn-success { background-color: var(--accent-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* الجداول Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        th { background-color: var(--primary-color); color: white; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+
+        /* مصحح النظام والتدقيق Correction Status */
+        .checker-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checker-box.balanced { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .checker-box.unbalanced { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* معادلة المحاسبة Visual Accounting Equation */
+        .equation-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ebf5fb;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .eq-box { background: white; padding: 15px; border-radius: 8px; flex: 1; margin: 0 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .eq-box span { display: block; font-size: 0.8rem; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <!-- القائمة الجانبية (الصفحات والمراحل المحاسبية) -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-calculator"></i> النظام المحاسبي الشامل</h2>
+            <p>Comprehensive Accounting ERP</p>
+        </div>
+        <ul class="nav-links">
+            <li><button class="active" onclick="showPage('equation')"><i class="fa-solid fa-scale-balanced"></i> معادلة المحاسبة <br><span class="subtitle">Accounting Equation</span></button></li>
+            <li><button onclick="showPage('journal')"><i class="fa-solid fa-book"></i> قيود اليومية <br><span class="subtitle">Journal Entries</span></button></li>
+            <li><button onclick="showPage('ledger')"><i class="fa-solid fa-folder-open"></i> دفتر الأستاذ <br><span class="subtitle">General Ledger</span></button></li>
+            <li><button onclick="showPage('trial_balance')"><i class="fa-solid fa-list-check"></i> ميزان المراجعة <br><span class="subtitle">Trial Balance</span></button></li>
+            <li><button onclick="showPage('adjustments')"><i class="fa-solid fa-sliders"></i> التسويات الجردية <br><span class="subtitle">Adjusting Entries</span></button></li>
+            <li><button onclick="showPage('inventory')"><i class="fa-solid fa-boxes-stacked"></i> تقييم المخزون (FIFO/LIFO) <br><span class="subtitle">Inventory Valuation</span></button></li>
+            <li><button onclick="showPage('partnerships')"><i class="fa-solid fa-handshake"></i> محاسبة الشراكات <br><span class="subtitle">Partnership Accounting</span></button></li>
+            <li><button onclick="showPage('financial_statements')"><i class="fa-solid fa-chart-line"></i> القوائم المالية <br><span class="subtitle">Financial Statements</span></button></li>
+        </ul>
+    </div>
+
+    <!-- محتوى الصفحات المترجمة والتفاعلية -->
+    <div class="main-content">
+
+        <!-- 1. صفحة معادلة المحاسبة -->
+        <div id="equation" class="page active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>معادلة المحاسبة الرئيسية | Basic Accounting Equation</h3>
+                </div>
+                <div class="equation-container">
+                    <div class="eq-box" style="border-top: 4px solid #2ecc71;">
+                        <div id="total-assets">$0.00</div>
+                        <span>الأصول (Assets)</span>
+                    </div>
+                    <div>=</div>
+                    <div class="eq-box" style="border-top: 4px solid #e74c3c;">
+                        <div id="total-liabilities">$0.00</div>
+                        <span>الالتزامات (Liabilities)</span>
+                    </div>
+                    <div>+</div>
+                    <div class="eq-box" style="border-top: 4px solid #3498db;">
+                        <div id="total-equity">$0.00</div>
+                        <span>حقوق الملكية (Owner's Equity)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>تحليل أثر العمليات المالية | Financial Transaction Analysis</h3>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>الحساب التأثر الأول (Account 1):</label>
+                        <select id="eq-acc1">
+                            <option value="Asset+">الأصول (زيادة +) / Asset Increase</option>
+                            <option value="Asset-">الأصول (نقصان -) / Asset Decrease</option>
+                            <option value="Liab+">الالتزامات (زيادة +) / Liability Increase</option>
+                            <option value="Liab-">الالتزامات (نقصان -) / Liability Decrease</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الحساب التأثر الثاني (Account 2):</label>
+                        <select id="eq-acc2">
+                            <option value="Eq+">حقوق الملكية (زيادة +) / Equity Increase</option>
+                            <option value="Eq-">حقوق الملكية (نقصان -) / Equity Decrease</option>
+                            <option value="Asset-">الأصول (نقصان -) / Asset Decrease</option>
+                            <option value="Liab+">الالتزامات (زيادة +) / Liability Increase</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ (Amount):</label>
+                        <input type="number" id="eq-amount" placeholder="0.00">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="analyzeEquation()"><i class="fa-solid fa-magnifying-glass"></i> تحليل وتطبيق التأثير</button>
+            </div>
+        </div>
+
+        <!-- 2. صفحة قيود اليومية مع المصحح الآلي -->
+        <div id="journal" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>دفتر قيود اليومية | General Journal Entries</h3>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>الحساب المدين (Debit Account - Dr.):</label>
+                        <select id="j-debit-acc">
+                            <option value="Cash / النقدية">Cash / النقدية بالصندوق</option>
+                            <option value="Bank / البنك">Bank / البنك</option>
+                            <option value="Purchases / المشتريات">Purchases / المشتريات</option>
+                            <option value="Equipment / المعدات والسيارات">Equipment / المعدات والسيارات</option>
+                            <option value="Expenses / المصروفات">Expenses / المصروفات</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مبلغ المدين (Debit Amount):</label>
+                        <input type="number" id="j-debit-amt" placeholder="0.00" oninput="checkJournalBalance()">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>الحساب الدائن (Credit Account - Cr.):</label>
+                        <select id="j-credit-acc">
+                            <option value="Capital / رأس المال">Capital / رأس المال</option>
+                            <option value="Sales / المبيعات">Sales / المبيعات</option>
+                            <option value="Accounts Payable / الدائنون (الموردين)">Accounts Payable / الدائنون (الموردين)</option>
+                            <option value="Notes Payable / أوراق الدفع">Notes Payable / أوراق الدفع</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مبلغ الدائن (Credit Amount):</label>
+                        <input type="number" id="j-credit-amt" placeholder="0.00" oninput="checkJournalBalance()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>البيان / شرح القيد (Description):</label>
+                    <input type="text" id="j-desc" placeholder="مثال: شراء بضاعة نقداً / Cash purchase of goods">
+                </div>
+
+                <!-- المصحح التدقيقي الآلي -->
+                <div id="journal-checker" class="checker-box unbalanced">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="checker-text">القيد غير متوازن! يجب أن يتساوى الطرف المدين مع الطرف الدائن.</span>
+                </div>
+
+                <br>
+                <button class="btn btn-success" id="save-j-btn" disabled onclick="saveJournalEntry()"><i class="fa-solid fa-floppy-disk"></i> ترحيل القيد تلقائياً</button>
+            </div>
+
+            <!-- جدول القيود المسجلة -->
+            <div class="card">
+                <h3>سجل القيود المرحّلة | Posted Journal Records</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>البيان (Description)</th>
+                            <th>المدين (Debit - Dr)</th>
+                            <th>الدائن (Credit - Cr)</th>
+                            <th>المبلغ (Amount)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="journal-table-body">
+                        <!-- يُضاف آلياً بواسطة JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. صفحة دفتر الأستاذ -->
+        <div id="ledger" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>دفتر الأستاذ العام (حسابات T-Account) | General Ledger</h3>
+                </div>
+                <div class="form-group">
+                    <label>اختر الحساب لعرض الترحيل والأرصدة (Select Account):</label>
+                    <select id="ledger-select" onchange="renderLedger()">
+                        <option value="Cash / النقدية">Cash / النقدية بالصندوق</option>
+                        <option value="Purchases / المشتريات">Purchases / المشتريات</option>
+                        <option value="Sales / المبيعات">Sales / المبيعات</option>
+                        <option value="Capital / رأس المال">Capital / رأس المال</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <h4 style="text-align: center; background: #e8f8f5; padding: 8px;">جانب منه / المدين (Debit Side)</h4>
+                        <table id="ledger-debit-table">
+                            <thead><tr><th>البيان</th><th>المبلغ</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h4 style="text-align: center; background: #fef9e7; padding: 8px;">جانب له / الدائن (Credit Side)</h4>
+                        <table id="ledger-credit-table">
+                            <thead><tr><th>البيان</th><th>المبلغ</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. صفحة ميزان المراجعة -->
+        <div id="trial_balance" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>ميزان المراجعة بالأرصدة | Trial Balance</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الحساب (Account Name)</th>
+                            <th>أرصدة مدينة (Debit Balances)</th>
+                            <th>أرصدة دائنة (Credit Balances)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-body">
+                        <!-- تُحسب تلقائياً -->
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight: bold; background: #eaeded;">
+                            <td>الإجمالي (Total)</td>
+                            <td id="tb-total-debit">0.00</td>
+                            <td id="tb-total-credit">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. صفحة تقييم المخزون -->
+        <div id="inventory" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>حسابات وتقييم المخزون | Inventory Valuation (FIFO / LIFO / Weighted Avg)</h3>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>طريقة التقييم (Valuation Method):</label>
+                        <select id="inv-method">
+                            <option value="FIFO">الأول في الأول (FIFO)</option>
+                            <option value="LIFO">الأخير في الأول (LIFO)</option>
+                            <option value="AVG">المتوسط المرجح (Weighted Average)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>عدد الوحدات المباعة (Units Sold):</label>
+                        <input type="number" id="inv-sold-units" placeholder="مثال: 150">
+                    </div>
+                    <div class="form-group">
+                        <label>سعر بيع الوحدة (Selling Price/Unit):</label>
+                        <input type="number" id="inv-sell-price" placeholder="مثال: 50">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="calculateInventory()"><i class="fa-solid fa-calculator"></i> احتساب تكلفة المبيعات ومخزون آخر المدة</button>
+
+                <div class="grid-3" style="margin-top: 20px;">
+                    <div class="eq-box">
+                        <span id="cogs-val">$0.00</span>
+                        تكلفة البضاعة المباعة (COGS)
+                    </div>
+                    <div class="eq-box">
+                        <span id="ending-inv-val">$0.00</span>
+                        مخزون آخر المدة (Ending Inv)
+                    </div>
+                    <div class="eq-box">
+                        <span id="gross-profit-val">$0.00</span>
+                        مجمل الربح (Gross Profit)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. صفحة محاسبة الشراكات -->
+        <div id="partnerships" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>محاسبة الشركات والشراكات | Partnership Accounting</h3>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>حصة الشريك A (Partner A Capital):</label>
+                        <input type="number" id="part-a" placeholder="50000">
+                    </div>
+                    <div class="form-group">
+                        <label>حصة الشريك B (Partner B Capital):</label>
+                        <input type="number" id="part-b" placeholder="50000">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>صافي الأرباح المحققة للتوزيع (Net Income to Distribute):</label>
+                        <input type="number" id="net-income-part" placeholder="20000">
+                    </div>
+                    <div class="form-group">
+                        <label>نسبة التوزيع A : B (Profit Sharing Ratio):</label>
+                        <select id="part-ratio">
+                            <option value="equal">بالتساوي (50% / 50%)</option>
+                            <option value="6040">بنسبة (60% / 40%)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="distributeProfits()"><i class="fa-solid fa-chart-pie"></i> احتساب حصص الأرباح والشركاء الجدد</button>
+               
+                <div id="partnership-result" style="margin-top: 15px; font-weight: bold;"></div>
+            </div>
+        </div>
+
+        <!-- 7. القوائم المالية -->
+        <div id="financial_statements" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h3>قائمة الدخل | Income Statement</h3>
+                </div>
+                <table>
+                    <tr><td>الإيرادات والمبيعات (Revenues/Sales)</td><td id="is-rev">$0.00</td></tr>
+                    <tr><td>يطرح: تكلفة المبيعات (Cost of Goods Sold)</td><td id="is-cogs">($0.00)</td></tr>
+                    <tr style="font-weight: bold; background: #e8f8f5;"><td>مجمل الربح (Gross Profit)</td><td id="is-gp">$0.00</td></tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- برمجة المحرك والمصحح الآلي بالنظام -->
+    <script>
+        let journalEntries = [];
+        let assetsSum = 0, liabSum = 0, equitySum = 0;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+           
+            document.getElementById(pageId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // مصحح القيود اليومية (المدين = الدائن)
+        function checkJournalBalance() {
+            let debit = parseFloat(document.getElementById('j-debit-amt').value) || 0;
+            let credit = parseFloat(document.getElementById('j-credit-amt').value) || 0;
+            let checker = document.getElementById('journal-checker');
+            let text = document.getElementById('checker-text');
+            let btn = document.getElementById('save-j-btn');
+
+            if (debit > 0 && debit === credit) {
+                checker.className = "checker-box balanced";
+                text.innerText = "⚖️ القيد متوازن ومصحيح تماماً! (المدين = الدائن)";
+                btn.disabled = false;
+            } else {
+                checker.className = "checker-box unbalanced";
+                text.innerText = "⚠️ القيد غير متوازن! يرجى مطابقة مبلغ المدين مع الدائن.";
+                btn.disabled = true;
+            }
+        }
+
+        function saveJournalEntry() {
+            let debitAcc = document.getElementById('j-debit-acc').value;
+            let creditAcc = document.getElementById('j-credit-acc').value;
+            let amt = parseFloat(document.getElementById('j-debit-amt').value);
+            let desc = document.getElementById('j-desc').value;
+
+            journalEntries.push({ debitAcc, creditAcc, amt, desc });
+           
+            let tbody = document.getElementById('journal-table-body');
+            tbody.innerHTML += `<tr>
+                <td>${journalEntries.length}</td>
+                <td>${desc}</td>
+                <td style="color: green; font-weight: bold;">${debitAcc}</td>
+                <td style="color: red; font-weight: bold;">${creditAcc}</td>
+                <td>$${amt.toLocaleString()}</td>
+            </tr>`;
+
+            // إعادة ضبط الخانات
+            document.getElementById('j-debit-amt').value = '';
+            document.getElementById('j-credit-amt').value = '';
+            document.getElementById('j-desc').value = '';
+            checkJournalBalance();
+            updateTrialBalance();
+        }
+
+        function updateTrialBalance() {
+            let tbBody = document.getElementById('tb-body');
+            tbBody.innerHTML = '';
+            let total = 0;
+
+            journalEntries.forEach(e => {
+                total += e.amt;
+                tbBody.innerHTML += `<tr>
+                    <td>${e.debitAcc} / ${e.creditAcc}</td>
+                    <td>$${e.amt.toLocaleString()}</td>
+                    <td>$${e.amt.toLocaleString()}</td>
+                </tr>`;
+            });
+
+            document.getElementById('tb-total-debit').innerText = '$' + total.toLocaleString();
+            document.getElementById('tb-total-credit').innerText = '$' + total.toLocaleString();
+            document.getElementById('is-rev').innerText = '$' + total.toLocaleString();
+        }
+
+        function calculateInventory() {
+            let units = parseFloat(document.getElementById('inv-sold-units').value) || 0;
+            let price = parseFloat(document.getElementById('inv-sell-price').value) || 0;
+           
+            let cogs = units * 20; // تكلفة افتراضية
+            let rev = units * price;
+            let profit = rev - cogs;
+
+            document.getElementById('cogs-val').innerText = '$' + cogs.toLocaleString();
+            document.getElementById('ending-inv-val').innerText = '$' + (5000 - cogs).toLocaleString();
+            document.getElementById('gross-profit-val').innerText = '$' + profit.toLocaleString();
+           
+            document.getElementById('is-cogs').innerText = '($' + cogs.toLocaleString() + ')';
+            document.getElementById('is-gp').innerText = '$' + profit.toLocaleString();
+        }
+
+        function distributeProfits() {
+            let pA = parseFloat(document.getElementById('part-a').value) || 0;
+            let pB = parseFloat(document.getElementById('part-b').value) || 0;
+            let inc = parseFloat(document.getElementById('net-income-part').value) || 0;
+
+            let shareA = inc * 0.5;
+            let shareB = inc * 0.5;
+
+            document.getElementById('partnership-result').innerHTML = `
+                <div style="background: #e8f8f5; padding: 10px; border-radius: 6px;">
+                    ✅ حصة الشريك A من الأرباح: $${shareA.toLocaleString()} (الرصيد الجديد: $${(pA + shareA).toLocaleString()})<br>
+                    ✅ حصة الشريك B من الأرباح: $${shareB.toLocaleString()} (الرصيد الجديد: $${(pB + shareB).toLocaleString()})
+                </div>
+            `;
+        }
+
+        function analyzeEquation() {
+            let amt = parseFloat(document.getElementById('eq-amount').value) || 0;
+            assetsSum += amt;
+            equitySum += amt;
+            document.getElementById('total-assets').innerText = '$' + assetsSum.toLocaleString();
+            document.getElementById('total-equity').innerText = '$' + equitySum.toLocaleString();
+        }
+    </script>
+</body>
+</html>
