@@ -8,33 +8,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java JDK
-        uses: actions/setup-java@v4
+      - name: Build APK from Web App
+        uses: subhash3/web-to-apk-action@v1
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install Cordova & Build APK
-        run: |
-          npm install -g cordova
-          cordova create myApp com.example.app "MyApp"
-          cp index.html myApp/www/
-          cd myApp
-          cordova platform add android
-          cordova build android --verbose
+          appName: 'MyApp'
+          appUrl: 'https://github.com'
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          path: '**/*.apk'
